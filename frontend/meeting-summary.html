@@ -1,0 +1,63 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Assistant</title>
+    <link rel="stylesheet" href="./assests/summary.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Meeting Assistant</h1>
+
+    <div class="speech-section">
+        <h2>Speech-to-Text</h2>
+        <div class="button-container">
+            <button id="startRecording">🎤 Start Recording</button>
+            <button id="stopRecording" disabled>⏹ Stop Recording</button>
+        </div>
+        <h3>Transcribed Text:</h3>
+        <p id="transcribedText" contenteditable="true">No text yet.</p>
+
+    </div>
+
+    <hr>
+    <h2>Meeting Summary</h2>
+    <div class="grid-container">
+        <div class="grid-item">
+            <h3>Tasks:</h3>
+            <ul id="tasksList"><li>Loading...</li></ul>
+            <button id="editTasks">✏️ Edit</button>
+        </div>
+
+        <div class="grid-item">
+            <h3>Key Points:</h3>
+            <ul id="keyPointsList"><li>Loading...</li></ul>
+            <button id="editKeyPoints">✏️ Edit</button>
+        </div>
+
+        <div class="grid-item">
+            <h3>Meeting Date:</h3>
+            <p id="meetingDate">Loading...</p>
+        </div>
+
+        <div class="grid-item">
+            <h3>Meeting Time:</h3>
+            <p id="meetingTime">Loading...</p>
+        </div>
+
+        
+
+
+    <a href="index.html" class="back-btn">⬅ Back</a>
+</div>
+
+<script src="app.js"></script>
+<script src="summary.js"></script>
+</body>
+</html>

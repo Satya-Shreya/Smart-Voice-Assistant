@@ -1,0 +1,83 @@
+/* General body styling */
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+    background-image: url('../images/freepik__upload__93097\ \(1\).png');
+}
+
+/* Container for the content */
+/* .container {
+    width: 80%;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+} */
+
+.container {
+    width: 80%;
+    max-width: 900px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Wrap buttons in a flex container */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Adds spacing between buttons */
+    margin-bottom: 20px;
+}
+
+h2{
+    color:#A6CDC6;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-style: italic;
+    font-size: 25px;
+}
+h1{
+    text-align: center;
+    font-weight:bold;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 30px;
+    color: black;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background: #9F8383;
+}
+button:hover{
+    background: #2a6f5e;
+}
+/* Email input field adjustments */
+input[type="email"] {
+    width: 100%; /* Increase width */
+    max-width: 400px; /* Slightly larger than before */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Add spacing between email field and button */
+.email-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Adds the 30px gap */
+    align-items: center;
+}
