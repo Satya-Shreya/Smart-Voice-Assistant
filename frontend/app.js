@@ -149,6 +149,36 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error("Error updating summary:", error));
     }
 
+
+    sendEmailBtn.addEventListener("click", () => {
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            emailStatus.innerText = "❌ Please enter an email.";
+            return;
+        }
+
+        fetch("/send-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                emailStatus.innerText = "✅ Email sent successfully!";
+            } else {
+                emailStatus.innerText = "❌ Error sending email.";
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            emailStatus.innerText = "❌ Error sending email.";
+        });
+    });
+
     editTasksBtn.addEventListener("click", () => editList(tasksList, "tasks"));
     editKeyPointsBtn.addEventListener("click", () => editList(keyPointsList, "keyPoints"));
 });
+
+

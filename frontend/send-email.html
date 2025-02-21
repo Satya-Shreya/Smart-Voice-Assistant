@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,5 +19,48 @@
     </div>
 
     <script src="app.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Meeting Email</title>
+    <link rel="stylesheet" href="./assests/email.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Send Meeting Summary</h1>
+        <div class="email-container">
+            <input type="email" id="emailInput" placeholder="Enter recipient's email">
+            <button id="sendEmailBtn">📧 Send Email</button>
+        </div>
+        <br>
+        <p id="emailStatus"></p>
+        <a href="index.html" class="back-btn">⬅ Back</a>
+    </div>
+
+    <script>
+        document.getElementById("sendEmailBtn").addEventListener("click", async () => {
+            const email = document.getElementById("emailInput").value;
+            if (!email) {
+                document.getElementById("emailStatus").innerText = "⚠ Please enter an email.";
+                return;
+            }
+
+            const response = await fetch("http://localhost:3000/send-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+
+            const result = await response.json();
+            document.getElementById("emailStatus").innerText = result.message;
+        });
+    </script>
 </body>
 </html>
