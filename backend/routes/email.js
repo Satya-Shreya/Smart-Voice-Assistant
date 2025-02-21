@@ -1,111 +1,128 @@
-// const express = require("express");
-// const nodemailer = require("nodemailer");
 
-// const router = express.Router();
-
-// // Email sending function
-// // async function testSMTPConnection() {
-// //     let transporter = nodemailer.createTransport({
-// //         service: "gmail",
-// //         auth: {
-// //             user: process.env.EMAIL_USER,
-// //             pass: process.env.EMAIL_PASS,
-// //         },
-        
-// //     });
-
-// //     transporter.verify((error, success) => {
-// //         if (error) {
-// //             console.error("❌ SMTP Connection Error:", error);
-// //         } else {
-// //             console.log("✅ SMTP Connection Successful.");
-// //         }
-// //     });
-// // }
-// // testSMTPConnection();
-// async function sendEmail(summary, recipientEmail) {
-//     let transporter = nodemailer.createTransport({
-//         service: "gmail",
-//         auth: {
-//             user: process.env.EMAIL_USER, // Store in .env
-//             pass: process.env.EMAIL_PASS, // Store in .env
-//         },
-//         host: "smtp.gmail.com",
-//         port: 465,
-//         secure: true,
-//     });
-
-//     let mailOptions = {
-//         from: process.env.EMAIL_USER,
-//         to: recipientEmail,
-//         subject: "Meeting Summary",
-//         text: summary,
-//     };
-
-//     try {
-//         let info = await transporter.sendMail(mailOptions);
-//         console.log("✅ Email sent:", info.response);
-//         return "Email sent successfully.";
-//     } catch (error) {
-//         console.error("❌ Error sending email:", error);
-//         throw new Error("Failed to send email.");
-//     }
-// }
-
-// // API Route for Sending Emails
-// router.post("/", async (req, res) => {
-//     const { email, summary } = req.body;
-//     if (!email || !summary) {
-//         return res.status(400).json({ message: "Email and summary are required." });
-//     }
-
-//     try {
-//         const response = await sendEmail(summary, email);
-//         res.json({ message: response });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// });
-
-// module.exports = router;
-
-
-
-const express = require("express");
+const http = require("http");
 const nodemailer = require("nodemailer");
-const router = express.Router();
+const mongoose = require("mongoose");
+const SummaryModel = require("../models/Summary"); 
+require("dotenv").config();
 
-// Configure mail transporter
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+mongoose.connect("mongodb://127.0.0.1:27017/voiceAssistantDB", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log(" Connected to MongoDB"))
+.catch(err => console.error(" MongoDB connection error:", err));
 
-// Handle email sending
-router.post("/", async (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-    }
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Meeting Summary",
-        text: "This is your meeting summary. Please check the details.",
-    };
-
+async function sendEmail(email, res) {
     try {
-        await transporter.sendMail(mailOptions);
-        res.json({ message: "Email sent successfully!" });
+        const latestSummary = await SummaryModel.findOne().sort({ _id: -1 });
+
+        if (!latestSummary) {
+            console.log(" No meeting summary found");
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, message: "No meeting summary found" }));
+            return;
+        }
+
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
+            port: 465, 
+            secure: true, 
+            auth: {
+                user: "gbodhinisatyashreya@gmail.com",
+                pass: "fwqb eqky wbeb kowa" 
+            }
+        });
+
+        const mailOptions = {
+            from: "gbodhinisatyashreya@gmail.com",
+            to: email,
+            subject: "Meeting Summary",
+            text: `Here is your latest meeting summary:\n
+            -Summary: ${latestSummary.text}
+- Date: ${latestSummary.meetingDate}
+- Time: ${latestSummary.meetingTime}
+- Deadline: ${latestSummary.deadline}
+
+
+ Key Points:
+${latestSummary.keyPoints.join("\n")}
+
+Tasks:
+${latestSummary.tasks.join("\n")}
+
+Best Regards,
+Your Smart Assistant`
+        };
+
+        let info = await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully:", info.response);
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, message: "Email sent successfully" }));
+
     } catch (error) {
-        console.error("Error sending email:", error);
-        res.status(500).json({ message: "Failed to send email" });
+        console.error(" Email send error:", error);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, message: "Failed to send email", error: error.message }));
+    }
+}
+
+const server = http.createServer((req, res) => {
+  
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5000");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    if (req.method === "POST" && req.url === "/send-email") {
+        let body = "";
+
+        req.on("data", chunk => {
+            body += chunk.toString();
+        });
+
+        req.on("end", () => {
+            try {
+                const { email } = JSON.parse(body);
+
+                if (!email) {
+                    res.writeHead(400, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ success: false, message: "Email is required" }));
+                    return;
+                }
+
+                sendEmail(email, res);
+
+            } catch (error) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ success: false, message: "Invalid JSON" }));
+            }
+        });
+
+    } else {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, message: "Route not found" }));
     }
 });
 
-module.exports = router;
+const PORT = 3000;
+server.listen(PORT, () => console.log(` Email server running on port ${PORT}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
